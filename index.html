@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agnes Playground · 免费畅用 Agnes 大模型</title>
+    <meta name="description" content="Agnes Playground 免费畅用 Agnes 大模型：支持文本对话、图像生成与视频生成。API Key 仅保存在本地浏览器，打开即可体验。">
+    <meta name="keywords" content="Agnes, Agnes AI, Agnes API, 免费大模型, 文生图, 图生图, 文生视频, AI 对话, Agnes Playground">
+    <meta name="author" content="ijaa">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <link rel="canonical" href="https://ijaa.github.io/agnes-playground/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="Agnes Playground">
+    <meta property="og:title" content="Agnes Playground · 免费畅用 Agnes 大模型">
+    <meta property="og:description" content="免费体验 Agnes 文本对话、图像生成与视频生成。API Key 本地保存，打开即可开始。">
+    <meta property="og:url" content="https://ijaa.github.io/agnes-playground/">
+    <meta property="og:image" content="https://ijaa.github.io/agnes-playground/assets/og-cover.png">
+    <meta property="og:image:width" content="1536">
+    <meta property="og:image:height" content="1024">
+    <meta property="og:image:alt" content="Agnes Playground 免费畅用 Agnes 大模型">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Agnes Playground · 免费畅用 Agnes 大模型">
+    <meta name="twitter:description" content="免费体验 Agnes 文本对话、图像生成与视频生成。API Key 本地保存，打开即可开始。">
+    <meta name="twitter:image" content="https://ijaa.github.io/agnes-playground/assets/og-cover.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
+    <meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Agnes Playground",
+      "url": "https://ijaa.github.io/agnes-playground/",
+      "description": "免费畅用 Agnes 大模型的前端体验台，支持文本对话、图像生成与视频生成。",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "zh-CN",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY"
+      },
+      "image": "https://ijaa.github.io/agnes-playground/assets/og-cover.png",
+      "author": {
+        "@type": "Person",
+        "name": "ijaa"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <nav class="navbar shell">
+                <a class="brand" href="#top" aria-label="Agnes Playground 首页">
+                    <img class="brand-logo" src="./assets/agnes-logo.svg" width="28" height="28" alt="Agnes">
+                    <span class="brand-copy">
+                        <strong>Agnes Playground</strong>
+                        <span>免费畅用</span>
+                    </span>
+                </a>
+                <div class="nav-links">
+                    <a href="#workspace">体验台</a>
+                    <a href="#models">模型</a>
+                    <a href="#usage">用法</a>
+                    <a href="#faq">FAQ</a>
+                </div>
+                <div class="nav-actions">
+                    <a class="nav-external" href="https://agnes-ai.com/" target="_blank" rel="noreferrer">官网</a>
+                    <a class="nav-external" href="https://platform.agnes-ai.com/" target="_blank" rel="noreferrer">平台</a>
+                    <button class="btn-api" onclick="openModal()">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span>API Key</span>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <section class="workspace workspace-hero shell" id="top">
+                <div class="workspace-intro reveal">
+                    <h1>免费畅用 Agnes 大模型</h1>
+                    <p>API Key 仅保存在本地浏览器，打开即可开始体验。</p>
+                </div>
+                <div class="glass-card glass-card-hero" id="workspace">
+                    <div class="workspace-header">
+                        <div class="workspace-badge">免费体验</div>
+                        <div class="tabs" role="tablist" aria-label="工作模式切换">
+                            <button class="tab active" data-mode="generate" onclick="switchTab(this)" aria-label="媒体生成">
+                                <span class="tab-icon">生成</span>
+                                <span>媒体输出</span>
+                            </button>
+                            <button class="tab" data-mode="chat" onclick="switchTab(this)" aria-label="分析与问答">
+                                <span class="tab-icon">对话</span>
+                                <span>分析与问答</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="generateMode" class="workspace-mode" style="display: block;">
+                        <div class="generate-layout">
+                            <div class="generate-main">
+                                <div class="input-main">
+                                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                                        <input type="file" id="fileInput" accept="image/*" multiple hidden onchange="handleUpload(this)">
+                                        <div id="uploadPlaceholder" class="upload-placeholder">
+                                            <span class="upload-plus">+</span>
+                                            <span class="upload-hint">上传参考图，最多 4 张</span>
+                                        </div>
+                                        <div class="upload-preview" id="uploadPreview" style="display:none"></div>
+                                    </div>
+
+                                    <div class="prompt-area">
+                                        <div class="prompt-input-wrap">
+                                            <label class="sr-only" for="promptInput">提示词输入</label>
+                                            <textarea class="prompt-input" id="promptInput" placeholder="描述画面、镜头、风格或你想继续扩展的创意" oninput="togglePromptClearButton()"></textarea>
+                                            <button class="prompt-clear-btn" id="promptClearBtn" onclick="clearPromptInput()" aria-label="清空提示词">清空</button>
+                                        </div>
+                                        <div class="generation-status" id="generationStatus">
+                                            <span class="status-icon" id="statusIcon">待命</span>
+                                            <span class="status-text" id="statusText">已准备</span>
+                                            <span class="status-time" id="statusTime">0s</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                                <aside class="generate-sidebar">
+                                    <div class="control-card">
+                                        <div class="control-card-label">参数设置</div>
+                                        <div class="bottom-bar">
+                                            <div class="type-picker" id="typePicker" role="tablist" aria-label="生成类型">
+                                                <button class="type-option active" type="button" onclick="selectType('text2img', '图', '文生图')">
+                                                    <strong>文生图</strong>
+                                                    <span>文本生成图片</span>
+                                                </button>
+                                                <button class="type-option" type="button" onclick="selectType('img2img', '改', '图生图')">
+                                                    <strong>图生图</strong>
+                                                    <span>参考图改写</span>
+                                                </button>
+                                                <button class="type-option" type="button" onclick="selectType('text2video', '视', '文生视频')">
+                                                    <strong>文生视频</strong>
+                                                    <span>文本生成视频</span>
+                                                </button>
+                                                <button class="type-option" type="button" onclick="selectType('img2video', '影', '图生视频')">
+                                                    <strong>图生视频</strong>
+                                                    <span>图片扩展视频</span>
+                                                </button>
+                                            </div>
+                                            <div class="params-row">
+                                                <div class="param-dropdown" id="modelDropdown">
+                                                    <button class="param-trigger" onclick="toggleDropdown('modelDropdown')">
+                                                        <span class="param-prefix">模</span>
+                                                    <span id="modelText">Image 2.1</span>
+                                                    <span class="param-arrow">▼</span>
+                                                </button>
+                                                <div class="param-menu" id="modelMenu">
+                                                    <div class="param-option active" onclick="selectModel('agnes-image-2.1-flash', 'Image 2.1')">Image 2.1 Flash</div>
+                                                    <div class="param-option" onclick="selectModel('agnes-image-2.0-flash', 'Image 2.0')">Image 2.0 Flash</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="param-dropdown" id="ratioDropdown">
+                                                <button class="param-trigger" onclick="toggleDropdown('ratioDropdown')">
+                                                    <span class="param-prefix">比</span>
+                                                    <span id="ratioText">9:16</span>
+                                                    <span class="param-arrow">▼</span>
+                                                </button>
+                                                <div class="param-menu" id="ratioMenu">
+                                                    <div class="param-option" onclick="selectRatio('2048x2048', '1:1')">1:1</div>
+                                                    <div class="param-option" onclick="selectRatio('2048x2736', '3:4')">3:4</div>
+                                                    <div class="param-option" onclick="selectRatio('2736x2048', '4:3')">4:3</div>
+                                                    <div class="param-option active" onclick="selectRatio('2048x3640', '9:16')">9:16</div>
+                                                    <div class="param-option" onclick="selectRatio('3640x2048', '16:9')">16:9</div>
+                                                    <div class="param-option" onclick="selectRatio('2048x3072', '2:3')">2:3</div>
+                                                    <div class="param-option" onclick="selectRatio('3072x2048', '3:2')">3:2</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="param-dropdown" id="durationDropdown" style="display:none">
+                                                <button class="param-trigger" onclick="toggleDropdown('durationDropdown')">
+                                                    <span class="param-prefix">时</span>
+                                                    <span id="durationText">约 5 秒</span>
+                                                    <span class="param-arrow">▼</span>
+                                                </button>
+                                                <div class="param-menu">
+                                                    <div class="param-option" onclick="selectDuration(81, '约 3 秒')">约 3 秒 (81 帧)</div>
+                                                    <div class="param-option active" onclick="selectDuration(121, '约 5 秒')">约 5 秒 (121 帧)</div>
+                                                    <div class="param-option" onclick="selectDuration(161, '约 7 秒')">约 7 秒 (161 帧)</div>
+                                                    <div class="param-option" onclick="selectDuration(241, '约 10 秒')">约 10 秒 (241 帧)</div>
+                                                    <div class="param-option" onclick="selectDuration(361, '约 15 秒')">约 15 秒 (361 帧)</div>
+                                                    <div class="param-option" onclick="selectDuration(441, '约 18 秒')">约 18 秒 (441 帧)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="control-card control-card-actions">
+                                    <div class="control-card-label">操作</div>
+                                    <div class="action-row">
+                                        <button class="btn-secondary" onclick="optimizePrompt()">优化提示词</button>
+                                        <button class="btn-generate" id="generateBtn" onclick="generate()">开始生成</button>
+                                    </div>
+                                    <p class="control-note">图生图和图生视频模式下，可上传最多 4 张参考图。</p>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+
+                    <div class="chat-area workspace-mode" id="chatMode">
+                        <div class="chat-toolbar">
+                            <div class="chat-toolbar-left">
+                                <div class="param-dropdown chat-model-dropdown" id="chatModelDropdown">
+                                    <button class="toolbar-btn param-trigger" onclick="toggleDropdown('chatModelDropdown')">
+                                        <span class="param-prefix">模</span>
+                                        <span id="chatModelText">2.5 Flash</span>
+                                        <span class="param-arrow">▼</span>
+                                    </button>
+                                    <div class="param-menu" id="chatModelMenu">
+                                        <div class="param-option active" onclick="selectChatModel('agnes-2.5-flash', '2.5 Flash')">Agnes 2.5 Flash</div>
+                                        <div class="param-option" onclick="selectChatModel('agnes-2.0-flash', '2.0 Flash')">Agnes 2.0 Flash</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-toolbar-right">
+                                <button class="toolbar-btn expand-btn" onclick="expandChat()">放大</button>
+                                <button class="toolbar-btn clear-btn" onclick="clearChat()">清空</button>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-msg assistant">你好，我是 Agnes AI 助手。这里可免费体验文本、图像与视频相关能力，你可以直接提问，也可以上传图片让我分析。</div>
+                        </div>
+                        <div id="chatPreview"></div>
+                        <div class="chat-input-row">
+                            <div class="chat-input-wrapper">
+                                <label class="chat-upload">
+                                    上传
+                                    <input type="file" accept="image/*" multiple hidden onchange="handleChatUpload(this)">
+                                </label>
+                                <input class="chat-input" id="chatInput" placeholder="输入消息，或粘贴图片继续分析" onkeydown="if(event.key==='Enter')sendChat()" onpaste="handleChatPaste(event)">
+                                <button class="chat-send" onclick="sendChat()">发送</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results" id="resultsSection">
+                        <div class="results-header">
+                            <div>
+                                <div class="results-title">生成结果</div>
+                                <p class="results-subtitle">保存在当前浏览器，可预览、复制与下载。</p>
+                            </div>
+                        </div>
+                        <div class="results-empty" id="resultsEmpty">
+                            <p>还没有结果。输入提示词后会出现在这里。</p>
+                        </div>
+                        <div class="results-grid" id="resultsGrid"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="models shell" id="models">
+                <div class="section-heading reveal">
+                    <h2>免费可用模型</h2>
+                    <p>文本、图像、视频全覆盖，按任务直接切换，无需额外付费。</p>
+                </div>
+                <div class="models-grid">
+                    <article class="model-card reveal">
+                        <div class="model-card-top">
+                            <strong>Image 2.1 Flash</strong>
+                            <span class="model-tag">图像</span>
+                        </div>
+                        <p>免费文生图与图生图，适合快速出图和参考图改写。</p>
+                    </article>
+                    <article class="model-card reveal">
+                        <div class="model-card-top">
+                            <strong>Video V2.0</strong>
+                            <span class="model-tag">视频</span>
+                        </div>
+                        <p>免费文生视频与图生视频，可调节时长与画面比例。</p>
+                    </article>
+                    <article class="model-card reveal">
+                        <div class="model-card-top">
+                            <strong>Agnes 2.5 Flash</strong>
+                            <span class="model-tag">对话</span>
+                        </div>
+                        <p>免费文本问答、图片分析与深度思考，适合继续拆解结果。</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="usage shell" id="usage">
+                <div class="section-heading reveal">
+                    <h2>开始免费体验</h2>
+                    <p>三步即可免费调用 Agnes 文本、图像与视频模型 API。</p>
+                </div>
+                <div class="usage-grid">
+                    <article class="usage-card reveal">
+                        <span class="usage-step" aria-hidden="true">1</span>
+                        <h3>保存 API Key</h3>
+                        <p>在右上角填写 Key。也可前往 <a href="https://platform.agnes-ai.com/" target="_blank" rel="noreferrer">Agnes 平台</a> 获取。</p>
+                    </article>
+                    <article class="usage-card reveal">
+                        <span class="usage-step" aria-hidden="true">2</span>
+                        <h3>选择模型任务</h3>
+                        <p>文本对话、文生图 / 文生视频直接写描述；图生图 / 图生视频先上传参考图。</p>
+                    </article>
+                    <article class="usage-card reveal">
+                        <span class="usage-step" aria-hidden="true">3</span>
+                        <h3>查看本地结果</h3>
+                        <p>结果保存在当前浏览器，可预览、复制提示词和下载。</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="faq shell" id="faq">
+                <div class="section-heading reveal">
+                    <h2>常见问题</h2>
+                    <p>关于免费额度、Key、结果保存与模型能力。</p>
+                </div>
+                <div class="faq-list">
+                    <article class="faq-item reveal">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>这里调用 Agnes 模型 API 收费吗？</span>
+                            <span class="faq-symbol">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>本体验台强调免费畅用 Agnes 模型 API：文本、图像、视频等能力均可直接调用，无需额外付费门槛。实际可用额度以 Agnes 官方平台当前策略为准。</p>
+                        </div>
+                    </article>
+                    <article class="faq-item reveal">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>需要先配置什么才能开始使用？</span>
+                            <span class="faq-symbol">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>打开右上角 API Key 设置并保存。Key 只写入本地浏览器，不会上传到本站服务器。</p>
+                        </div>
+                    </article>
+                    <article class="faq-item reveal">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>支持哪些能力？</span>
+                            <span class="faq-symbol">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>支持文本对话、图像生成（文生图 / 图生图）与视频生成（文生视频 / 图生视频），可在同一页面内切换体验。</p>
+                        </div>
+                    </article>
+                    <article class="faq-item reveal">
+                        <button class="faq-question" type="button" aria-expanded="false">
+                            <span>生成结果会不会丢失？</span>
+                            <span class="faq-symbol">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>结果会写入浏览器本地存储，刷新页面后仍可查看。清理浏览器数据后会一并移除。</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <footer class="site-footer shell reveal">
+                <div class="footer-brand">
+                    <img class="footer-logo" src="./assets/agnes-logo.svg" width="24" height="24" alt="">
+                    <div>
+                        <strong>Agnes Playground</strong>
+                        <p>免费畅用 Agnes 文本、图像与视频模型 API 的体验页。</p>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <a href="https://agnes-ai.com/" target="_blank" rel="noreferrer">Agnes 官网</a>
+                    <a href="https://platform.agnes-ai.com/" target="_blank" rel="noreferrer">开发者平台</a>
+                </div>
+            </footer>
+        </main>
+
+    </div>
+
+    <div class="modal-overlay" id="apiKeyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>API Key 设置</h3>
+                <button class="modal-close" onclick="closeModal()" aria-label="关闭设置">×</button>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label" for="apiKeyInput">Agnes API Key</label>
+                <input type="password" class="modal-input" id="apiKeyInput" placeholder="sk-...">
+                <div class="modal-hint"><a href="https://platform.agnes-ai.com/" target="_blank" rel="noreferrer">前往 Agnes 平台获取 Key</a></div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-save" onclick="saveApiKey()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <button class="preview-close" onclick="closePreview()" aria-label="关闭预览">×</button>
+            <button class="preview-download" id="previewDownload" type="button">下载</button>
+            <div id="previewBody"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-modal-content">
+            <div class="chat-modal-header">
+                <span class="chat-modal-title">对话内容</span>
+                <button class="chat-modal-close" onclick="closeChatModal()" aria-label="关闭放大对话">×</button>
+            </div>
+            <div class="chat-modal-messages" id="modalMessages"></div>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>

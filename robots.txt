@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ijaa.github.io/agnes-playground/sitemap.xml
