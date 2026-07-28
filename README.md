@@ -125,3 +125,7 @@ npm run build
 ```
 
 产物输出到 `dist/`，静态资源使用相对路径，可直接挂到子路径。
+
+## 许可证
+
+本项目采用 [Apache License 2.0](./LICENSE) 开源协议。

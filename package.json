@@ -8,5 +8,6 @@
     "lint": "node --check scripts/build-static.mjs && node --check app.js",
     "test": "node --test tests/smoke.test.mjs",
     "preview": "python3 -m http.server 4173 -d dist"
-  }
+  },
+  "license": "Apache-2.0"
 }
