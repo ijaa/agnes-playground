@@ -243,7 +243,7 @@
                                     上传
                                     <input type="file" accept="image/*" multiple hidden onchange="handleChatUpload(this)">
                                 </label>
-                                <input class="chat-input" id="chatInput" placeholder="输入消息，或粘贴图片继续分析" onkeydown="if(event.key==='Enter')sendChat()" onpaste="handleChatPaste(event)">
+                                <input class="chat-input" id="chatInput" placeholder="输入消息，或粘贴图片继续分析" onkeydown="if(event.key==='Enter' && !event.isComposing) sendChat()" onpaste="handleChatPaste(event)">
                                 <button class="chat-send" onclick="sendChat()">发送</button>
                             </div>
                         </div>
