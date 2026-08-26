@@ -1,8 +1,22 @@
         let currentGenMode = 'text2img';
+        let currentModel = 'agnes-image-2.1-flash';
         let uploadImages = []; // 支持多图
         let chatHistory = [];
         let apiKey = localStorage.getItem('agnes_api_key') || '';
         if (apiKey) document.getElementById('statusDot').classList.add('active');
+
+        const VIDEO_ASPECT_RATIOS = ['21:9', '16:9', '4:3', '1:1', '3:4', '9:16'];
+        const VIDEO_DURATION_OPTIONS = [
+            { seconds: '4', label: '4 秒' },
+            { seconds: '5', label: '5 秒' },
+            { seconds: '6', label: '6 秒' },
+            { seconds: '7', label: '7 秒' },
+            { seconds: '8', label: '8 秒' },
+            { seconds: '9', label: '9 秒' },
+            { seconds: '10', label: '10 秒' },
+            { seconds: '11', label: '11 秒' },
+            { seconds: '12', label: '12 秒' }
+        ];
 
         const IMAGE_SIZE_MAP = {
             '1:1': '2048x2048',
@@ -193,33 +207,49 @@
             const modelMenu = document.getElementById('modelMenu');
             const modelText = document.getElementById('modelText');
             if (isVideo) {
-                modelMenu.innerHTML = '<div class="param-option active" onclick="selectModel(\'agnes-video-v2.0\', \'Video V2.0\')">Video V2.0</div>';
-                modelText.textContent = 'Video V2.0';
+                modelMenu.innerHTML = '<div class="param-option active" onclick="selectModel(\'agnes-video-2.5-flash\', \'Video 2.5 Flash\')">Video 2.5 Flash</div>';
+                modelText.textContent = 'Video 2.5 Flash';
+                currentModel = 'agnes-video-2.5-flash';
             } else {
                 modelMenu.innerHTML = `
                     <div class="param-option active" onclick="selectModel(\'agnes-image-2.1-flash\', \'Image 2.1\')">Image 2.1 Flash</div>
                     <div class="param-option" onclick="selectModel(\'agnes-image-2.0-flash\', \'Image 2.0\')">Image 2.0 Flash</div>`;
                 modelText.textContent = 'Image 2.1';
+                currentModel = 'agnes-image-2.1-flash';
             }
 
             // Update ratio menu and display text
             const ratioMenu = document.getElementById('ratioMenu');
             const ratioText = document.getElementById('ratioText');
             if (isVideo) {
-                ratioMenu.innerHTML = `
-                    <div class="param-option active" onclick="selectRatio('1152x768', '16:9')">16:9</div>
-                    <div class="param-option" onclick="selectRatio('768x1152', '9:16')">9:16</div>`;
+                ratioMenu.innerHTML = VIDEO_ASPECT_RATIOS.map((ratio, i) =>
+                    `<div class="param-option${i === 1 ? ' active' : ''}" onclick="selectRatio('${ratio}', '${ratio}')">${ratio}</div>`
+                ).join('');
                 ratioText.textContent = '16:9';
             } else {
                 ratioMenu.innerHTML = buildImageRatioMenu();
                 ratioText.textContent = '9:16';
             }
+
+            // Update duration menu based on model type
+            updateDurationMenu(currentModel);
         }
 
-        let selectedDuration = 121;
+        let selectedSeconds = '5';
 
-        function selectDuration(frames, text, sourceEvent = window.event) {
-            selectedDuration = frames;
+        function updateDurationMenu(model) {
+            const durationMenu = document.getElementById('durationMenu');
+            if (!durationMenu) return;
+
+            durationMenu.innerHTML = VIDEO_DURATION_OPTIONS.map((opt, i) =>
+                `<div class="param-option${i === 1 ? ' active' : ''}" onclick="selectDuration(${opt.seconds}, '${opt.label}')">${opt.label}</div>`
+            ).join('');
+            selectedSeconds = '5';
+            document.getElementById('durationText').textContent = '5 秒';
+        }
+
+        function selectDuration(value, text, sourceEvent = window.event) {
+            selectedSeconds = String(value);
             document.getElementById('durationText').textContent = text;
             document.querySelectorAll('#durationDropdown .param-option').forEach(o => o.classList.remove('active'));
             sourceEvent?.target?.classList.add('active');
@@ -227,8 +257,10 @@
         }
 
         function selectModel(value, text, sourceEvent = window.event) {
+            currentModel = value;
             document.getElementById('modelText').textContent = text;
             document.querySelectorAll('#modelDropdown .param-option').forEach(o => o.classList.remove('active'));
+            updateDurationMenu(value);
             sourceEvent?.target?.classList.add('active');
             toggleDropdown('modelDropdown');
         }
@@ -763,11 +795,9 @@
         async function generateImage(prompt) {
             updateGenerationStatus('正在生成图片...');
 
-            const model = document.querySelector('#modelMenu .param-option.active')?.textContent?.includes('2.1')
-                ? 'agnes-image-2.1-flash' : 'agnes-image-2.0-flash';
             const sizeText = document.getElementById('ratioText').textContent;
             const size = IMAGE_SIZE_MAP[sizeText] || IMAGE_SIZE_MAP['9:16'];
-            let body = { model, prompt, size };
+            let body = { model: currentModel, prompt, size };
 
             // 图生图支持多张参考图
             if (currentGenMode === 'img2img' && uploadImages.length > 0) {
@@ -802,15 +832,13 @@
             updateGenerationStatus('正在准备视频生成...');
 
             const sizeText = document.getElementById('ratioText').textContent;
-            const sizeMap = { '16:9': '1152x768', '9:16': '768x1152' };
-            const [width, height] = (sizeMap[sizeText] || '1152x768').split('x').map(Number);
             let body = {
-                model: 'agnes-video-v2.0',
+                model: currentModel,
                 prompt,
-                height,
-                width,
-                num_frames: selectedDuration,
-                frame_rate: 24
+                seconds: selectedSeconds,
+                mode: 'text',
+                size: '720P',
+                aspect_ratio: sizeText || '16:9'
             };
 
             // 图生视频直接把参考图的 base64 编码传给视频接口，避免依赖代理服务器写盘。
@@ -824,12 +852,8 @@
                     images.push(dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl);
                 }
 
-                if (images.length === 1) {
-                    body.image = images[0];
-                } else {
-                    body.image = images;
-                    body.mode = 'keyframes';
-                }
+                body.mode = 'reference';
+                body.images = images;
             }
 
             updateGenerationStatus('正在提交视频生成任务...');
@@ -872,7 +896,7 @@
                 updateGenerationStatus(`视频生成中... 已等待 ${elapsed} 秒`);
 
                 try {
-                    const res = await fetch(`https://apihub.agnes-ai.cn/agnesapi?video_id=${videoId}`, {
+                    const res = await fetch(`https://apihub.agnes-ai.cn/agnesapi?video_id=${videoId}&model_name=${currentModel}`, {
                         headers: { 'Authorization': `Bearer ${apiKey}` }
                     });
                     const data = await res.json();
@@ -1076,7 +1100,7 @@
 - agnes-2.0-flash: 编程/Agent/推理
 - agnes-image-2.1-flash: 图像生成（推荐）
 - agnes-image-2.0-flash: 图像快速生成
-- agnes-video-v2.0: 视频生成
+- agnes-video-2.5-flash: 视频快速生成（推荐）
 
 ## API 配置
 - Base URL: https://apihub.agnes-ai.cn/v1
@@ -1095,11 +1119,13 @@
 - 格式: extra_body.image = ["data:image/png;base64,..."]，需要传完整 Data URI Base64；多图时使用数组
 
 ## 图生视频注意
-- image 参数直接传纯 base64 编码，不带 data:image/... 前缀
-- 多图视频可配合 mode = "keyframes"
+- mode = "reference" 时，images 最多传 5 张
+- 查询任务时必须带 model_name = "agnes-video-2.5-flash"
 
 ## 视频生成注意
-- num_frames 有效值: 81, 121, 161, 241, 441
+- size 固定为 "720P"
+- seconds 支持字符串 "4"-"12"，默认 "5"
+- aspect_ratio 支持 21:9、16:9、4:3、1:1、3:4、9:16
 - 必须用 video_id 查询，不要用 task_id
 - 轮询间隔建议 5 秒
 

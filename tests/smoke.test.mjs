@@ -33,3 +33,46 @@ test('api endpoint uses china domain', () => {
   assert.match(app, /apihub\.agnes-ai\.cn/)
   assert.doesNotMatch(app, /apihub\.agnes-ai\.com/)
 })
+
+test('video generation supports agnes-video-2.5-flash model', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  assert.match(app, /agnes-video-2\.5-flash/)
+  assert.doesNotMatch(app, /agnes-video-v2\.0/)
+  assert.match(app, /model: currentModel/)
+})
+
+test('generated video payload uses agnes-video-2.5-flash API params', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const videoSection = app.slice(
+    app.indexOf('async function generateVideo'),
+    app.indexOf('async function pollVideo')
+  )
+  assert.match(videoSection, /model: currentModel/)
+  assert.match(videoSection, /seconds: selectedSeconds/)
+  assert.match(videoSection, /size: '720P'/)
+  assert.match(videoSection, /aspect_ratio/)
+  assert.match(videoSection, /body\.mode = 'reference'/)
+  assert.doesNotMatch(videoSection, /num_frames/)
+  assert.doesNotMatch(videoSection, /frame_rate/)
+  assert.doesNotMatch(videoSection, /height/)
+  assert.doesNotMatch(videoSection, /width/)
+})
+
+test('video model menu only lists agnes-video-2.5-flash', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const videoSection = app.slice(
+    app.indexOf('function selectType'),
+    app.indexOf('let selectedSeconds =')
+  )
+  assert.match(videoSection, /agnes-video-2\.5-flash/)
+  assert.doesNotMatch(videoSection, /agnes-video-v2\.0/)
+})
+
+test('video polling includes model_name param', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const pollSection = app.slice(
+    app.indexOf('async function pollVideo'),
+    app.indexOf('// 生成状态显示')
+  )
+  assert.match(pollSection, /model_name=\$\{currentModel\}/)
+})

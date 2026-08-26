@@ -184,16 +184,19 @@
                                             <div class="param-dropdown" id="durationDropdown" style="display:none">
                                                 <button class="param-trigger" onclick="toggleDropdown('durationDropdown')">
                                                     <span class="param-prefix">时</span>
-                                                    <span id="durationText">约 5 秒</span>
+                                                    <span id="durationText">5 秒</span>
                                                     <span class="param-arrow">▼</span>
                                                 </button>
-                                                <div class="param-menu">
-                                                    <div class="param-option" onclick="selectDuration(81, '约 3 秒')">约 3 秒 (81 帧)</div>
-                                                    <div class="param-option active" onclick="selectDuration(121, '约 5 秒')">约 5 秒 (121 帧)</div>
-                                                    <div class="param-option" onclick="selectDuration(161, '约 7 秒')">约 7 秒 (161 帧)</div>
-                                                    <div class="param-option" onclick="selectDuration(241, '约 10 秒')">约 10 秒 (241 帧)</div>
-                                                    <div class="param-option" onclick="selectDuration(361, '约 15 秒')">约 15 秒 (361 帧)</div>
-                                                    <div class="param-option" onclick="selectDuration(441, '约 18 秒')">约 18 秒 (441 帧)</div>
+                                                <div class="param-menu" id="durationMenu">
+                                                    <div class="param-option" onclick="selectDuration(4, '4 秒')">4 秒</div>
+                                                    <div class="param-option active" onclick="selectDuration(5, '5 秒')">5 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(6, '6 秒')">6 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(7, '7 秒')">7 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(8, '8 秒')">8 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(9, '9 秒')">9 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(10, '10 秒')">10 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(11, '11 秒')">11 秒</div>
+                                                    <div class="param-option" onclick="selectDuration(12, '12 秒')">12 秒</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -279,7 +282,7 @@
                     </article>
                     <article class="model-card reveal">
                         <div class="model-card-top">
-                            <strong>Video V2.0</strong>
+                            <strong>Video 2.5 Flash</strong>
                             <span class="model-tag">视频</span>
                         </div>
                         <p>免费文生视频与图生视频，可调节时长与画面比例。</p>
