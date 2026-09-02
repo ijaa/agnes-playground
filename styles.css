@@ -822,7 +822,25 @@ button {
     color: var(--text);
 }
 
-.control-card .params-row,
+.control-card .params-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.control-card .params-row #modelDropdown {
+    grid-column: 1 / -1;
+}
+
+.control-card .params-row .param-dropdown {
+    min-width: 0;
+}
+
+.control-card .params-row .param-dropdown:not(#modelDropdown):not([style*="display: none"]) ~ .param-dropdown:not([style*="display: none"]) .param-menu {
+    left: auto;
+    right: 0;
+}
+
 .control-card .action-row {
     flex-direction: column;
     align-items: stretch;

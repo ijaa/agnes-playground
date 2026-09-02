@@ -85,24 +85,63 @@ test('image generation defaults to agnes-image-2.5-flash', () => {
   assert.match(html, /param-option active" onclick="selectModel\('agnes-image-2\.5-flash'/)
 })
 
-test('image model menu lists 2.5 first and keeps legacy options', () => {
+test('image model menu only lists agnes-image-2.5-flash', () => {
   const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const html = readFileSync(resolve(root, 'index.html'), 'utf8')
   const menuSection = app.slice(
     app.indexOf('const modelMenu = document.getElementById'),
     app.indexOf('// Update ratio menu')
   )
-  assert.match(menuSection, /param-option active" onclick="selectModel\(\\'agnes-image-2\.5-flash\\'/)
-  assert.match(menuSection, /agnes-image-2\.1-flash/)
-  assert.match(menuSection, /agnes-image-2\.0-flash/)
   assert.match(menuSection, /currentModel = 'agnes-image-2\.5-flash'/)
+  assert.doesNotMatch(app, /agnes-image-2\.1-flash/)
+  assert.doesNotMatch(app, /agnes-image-2\.0-flash/)
+  assert.doesNotMatch(html, /agnes-image-2\.1-flash/)
+  assert.doesNotMatch(html, /agnes-image-2\.0-flash/)
 })
 
-test('generated image payload uses currentModel', () => {
+test('generated image payload uses tiered size plus ratio', () => {
   const app = readFileSync(resolve(root, 'app.js'), 'utf8')
   const imageSection = app.slice(
     app.indexOf('async function generateImage'),
     app.indexOf('async function generateVideo')
   )
   assert.match(imageSection, /model: currentModel/)
+  assert.match(imageSection, /let body = \{ model: currentModel, prompt, size, ratio \}/)
+  assert.doesNotMatch(imageSection, /IMAGE_SIZE_MAP/)
   assert.doesNotMatch(imageSection, /agnes-image-2\.[01]-flash/)
+})
+
+test('image size tiers and ratios follow the official table', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  assert.match(app, /const IMAGE_SIZE_TIERS = \['1K', '2K', '3K', '4K'\]/)
+  assert.match(app, /const DEFAULT_IMAGE_SIZE = '2K'/)
+  assert.doesNotMatch(app, /const IMAGE_SIZE_MAP/)
+  for (const ratio of ['1:1', '3:4', '4:3', '9:16', '16:9', '2:3', '3:2', '21:9']) {
+    assert.ok(app.includes(`'${ratio}'`), `missing ratio ${ratio}`)
+  }
+  // 抽查官方档位输出尺寸
+  assert.match(app, /'16:9': \{ '1K': '1312x736',  '2K': '2624x1472'/)
+  assert.match(app, /'21:9': \{ '1K': '1568x672',  '2K': '3136x1344'/)
+})
+
+test('image size dropdown is hidden for video modes', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const html = readFileSync(resolve(root, 'index.html'), 'utf8')
+  assert.match(app, /getElementById\('sizeDropdown'\)\.style\.display = isVideo \? 'none' : 'block'/)
+  assert.match(html, /<span id="sizeText">2K<\/span>/)
+  assert.match(html, /onclick="selectImageSize\('2K'\)"/)
+})
+
+test('size and ratio dropdowns share one params row', () => {
+  const html = readFileSync(resolve(root, 'index.html'), 'utf8')
+  const css = readFileSync(resolve(root, 'styles.css'), 'utf8')
+  const paramsRow = html.slice(
+    html.indexOf('class="params-row"'),
+    html.indexOf('id="durationDropdown"')
+  )
+  assert.match(paramsRow, /id="sizeDropdown"/)
+  assert.match(paramsRow, /id="ratioDropdown"/)
+  assert.match(css, /\.control-card \.params-row \{\s*display: grid;/)
+  assert.match(css, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/)
+  assert.match(css, /#modelDropdown \{\s*grid-column: 1 \/ -1;/)
 })

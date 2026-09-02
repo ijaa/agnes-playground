@@ -18,25 +18,24 @@
             { seconds: '12', label: '12 秒' }
         ];
 
-        const IMAGE_SIZE_MAP = {
-            '1:1': '2048x2048',
-            '3:4': '2048x2736',
-            '4:3': '2736x2048',
-            '9:16': '2048x3640',
-            '16:9': '3640x2048',
-            '2:3': '2048x3072',
-            '3:2': '3072x2048'
+        const IMAGE_RATIOS = ['1:1', '3:4', '4:3', '9:16', '16:9', '2:3', '3:2', '21:9'];
+        const IMAGE_SIZE_TIERS = ['1K', '2K', '3K', '4K'];
+        const DEFAULT_IMAGE_RATIO = '9:16';
+        const DEFAULT_IMAGE_SIZE = '2K';
+
+        // 官方档位输出尺寸表：只用于结果卡片展示，请求里传的是 size 档位 + ratio
+        const IMAGE_OUTPUT_SIZES = {
+            '1:1':  { '1K': '1024x1024', '2K': '2048x2048', '3K': '3072x3072', '4K': '4096x4096' },
+            '3:4':  { '1K': '864x1152',  '2K': '1728x2304', '3K': '2592x3456', '4K': '3456x4608' },
+            '4:3':  { '1K': '1152x864',  '2K': '2304x1728', '3K': '3456x2592', '4K': '4608x3456' },
+            '9:16': { '1K': '736x1312',  '2K': '1472x2624', '3K': '2208x3936', '4K': '2944x5248' },
+            '16:9': { '1K': '1312x736',  '2K': '2624x1472', '3K': '3936x2208', '4K': '5248x2944' },
+            '2:3':  { '1K': '832x1248',  '2K': '1664x2496', '3K': '2496x3744', '4K': '3328x4992' },
+            '3:2':  { '1K': '1248x832',  '2K': '2496x1664', '3K': '3744x2496', '4K': '4992x3328' },
+            '21:9': { '1K': '1568x672',  '2K': '3136x1344', '3K': '4704x2016', '4K': '6272x2688' }
         };
 
-        const IMAGE_RATIO_OPTIONS = [
-            { label: '1:1', size: IMAGE_SIZE_MAP['1:1'] },
-            { label: '3:4', size: IMAGE_SIZE_MAP['3:4'] },
-            { label: '4:3', size: IMAGE_SIZE_MAP['4:3'] },
-            { label: '9:16', size: IMAGE_SIZE_MAP['9:16'], active: true },
-            { label: '16:9', size: IMAGE_SIZE_MAP['16:9'] },
-            { label: '2:3', size: IMAGE_SIZE_MAP['2:3'] },
-            { label: '3:2', size: IMAGE_SIZE_MAP['3:2'] }
-        ];
+        let selectedImageSize = DEFAULT_IMAGE_SIZE;
 
         // IndexedDB 封装
         const DB_NAME = 'AgnesCreativeSpace';
@@ -176,9 +175,23 @@
         }
 
         function buildImageRatioMenu() {
-            return IMAGE_RATIO_OPTIONS.map(({ label, size, active }) =>
-                `<div class="param-option${active ? ' active' : ''}" onclick="selectRatio('${size}', '${label}')">${label}</div>`
+            return IMAGE_RATIOS.map(ratio =>
+                `<div class="param-option${ratio === DEFAULT_IMAGE_RATIO ? ' active' : ''}" onclick="selectRatio('${ratio}', '${ratio}')">${ratio}</div>`
             ).join('');
+        }
+
+        function buildImageSizeMenu() {
+            return IMAGE_SIZE_TIERS.map(tier =>
+                `<div class="param-option${tier === DEFAULT_IMAGE_SIZE ? ' active' : ''}" onclick="selectImageSize('${tier}')">${tier}</div>`
+            ).join('');
+        }
+
+        function resetImageSizeMenu() {
+            const sizeMenu = document.getElementById('sizeMenu');
+            if (!sizeMenu) return;
+            sizeMenu.innerHTML = buildImageSizeMenu();
+            selectedImageSize = DEFAULT_IMAGE_SIZE;
+            document.getElementById('sizeText').textContent = DEFAULT_IMAGE_SIZE;
         }
 
         function selectType(mode, icon, text, sourceEvent = window.event) {
@@ -200,8 +213,9 @@
                 updateUploadPreview();
             }
 
-            // Show/hide duration dropdown
+            // Show/hide duration & image size dropdowns
             document.getElementById('durationDropdown').style.display = isVideo ? 'block' : 'none';
+            document.getElementById('sizeDropdown').style.display = isVideo ? 'none' : 'block';
 
             // Update model menu and display text
             const modelMenu = document.getElementById('modelMenu');
@@ -211,10 +225,7 @@
                 modelText.textContent = 'Video 2.5 Flash';
                 currentModel = 'agnes-video-2.5-flash';
             } else {
-                modelMenu.innerHTML = `
-                    <div class="param-option active" onclick="selectModel(\'agnes-image-2.5-flash\', \'Image 2.5\')">Image 2.5 Flash</div>
-                    <div class="param-option" onclick="selectModel(\'agnes-image-2.1-flash\', \'Image 2.1\')">Image 2.1 Flash</div>
-                    <div class="param-option" onclick="selectModel(\'agnes-image-2.0-flash\', \'Image 2.0\')">Image 2.0 Flash</div>`;
+                modelMenu.innerHTML = '<div class="param-option active" onclick="selectModel(\'agnes-image-2.5-flash\', \'Image 2.5\')">Image 2.5 Flash</div>';
                 modelText.textContent = 'Image 2.5';
                 currentModel = 'agnes-image-2.5-flash';
             }
@@ -229,7 +240,8 @@
                 ratioText.textContent = '16:9';
             } else {
                 ratioMenu.innerHTML = buildImageRatioMenu();
-                ratioText.textContent = '9:16';
+                ratioText.textContent = DEFAULT_IMAGE_RATIO;
+                resetImageSizeMenu();
             }
 
             // Update duration menu based on model type
@@ -266,6 +278,14 @@
             toggleDropdown('modelDropdown');
         }
 
+        function selectImageSize(value, sourceEvent = window.event) {
+            selectedImageSize = value;
+            document.getElementById('sizeText').textContent = value;
+            document.querySelectorAll('#sizeDropdown .param-option').forEach(o => o.classList.remove('active'));
+            sourceEvent?.target?.classList.add('active');
+            toggleDropdown('sizeDropdown');
+        }
+
         function selectRatio(value, text, sourceEvent = window.event) {
             document.getElementById('ratioText').textContent = text;
             document.querySelectorAll('#ratioDropdown .param-option').forEach(o => o.classList.remove('active'));
@@ -295,6 +315,7 @@
             console.debug('Agnes img2img payload preview:', {
                 model: body.model,
                 size: body.size,
+                ratio: body.ratio,
                 promptLength: body.prompt?.length || 0,
                 extra_body: {
                     response_format: body?.extra_body?.response_format,
@@ -796,9 +817,10 @@
         async function generateImage(prompt) {
             updateGenerationStatus('正在生成图片...');
 
-            const sizeText = document.getElementById('ratioText').textContent;
-            const size = IMAGE_SIZE_MAP[sizeText] || IMAGE_SIZE_MAP['9:16'];
-            let body = { model: currentModel, prompt, size };
+            const ratio = IMAGE_OUTPUT_SIZES[document.getElementById('ratioText').textContent]
+                ? document.getElementById('ratioText').textContent : DEFAULT_IMAGE_RATIO;
+            const size = IMAGE_SIZE_TIERS.includes(selectedImageSize) ? selectedImageSize : DEFAULT_IMAGE_SIZE;
+            let body = { model: currentModel, prompt, size, ratio };
 
             // 图生图支持多张参考图
             if (currentGenMode === 'img2img' && uploadImages.length > 0) {
@@ -824,7 +846,7 @@
             const data = await res.json();
             if (data.error) throw new Error(data.error.message);
             if (data.data?.[0]?.url) {
-                addResult('image', data.data[0].url, prompt, { requestedSize: size });
+                addResult('image', data.data[0].url, prompt, { requestedSize: IMAGE_OUTPUT_SIZES[ratio]?.[size] || '' });
                 toast('生成成功', 'success');
             }
         }
@@ -1099,9 +1121,7 @@
 ## 可用模型
 - agnes-2.5-flash: 通用对话/高并发（推荐）
 - agnes-2.0-flash: 编程/Agent/推理
-- agnes-image-2.5-flash: 图像生成（推荐）
-- agnes-image-2.1-flash: 图像生成（上一代）
-- agnes-image-2.0-flash: 图像快速生成
+- agnes-image-2.5-flash: 图像生成
 - agnes-video-2.5-flash: 视频快速生成（推荐）
 
 ## API 配置

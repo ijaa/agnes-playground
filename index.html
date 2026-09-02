@@ -160,8 +160,20 @@
                                                 </button>
                                                 <div class="param-menu" id="modelMenu">
                                                     <div class="param-option active" onclick="selectModel('agnes-image-2.5-flash', 'Image 2.5')">Image 2.5 Flash</div>
-                                                    <div class="param-option" onclick="selectModel('agnes-image-2.1-flash', 'Image 2.1')">Image 2.1 Flash</div>
-                                                    <div class="param-option" onclick="selectModel('agnes-image-2.0-flash', 'Image 2.0')">Image 2.0 Flash</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="param-dropdown" id="sizeDropdown">
+                                                <button class="param-trigger" onclick="toggleDropdown('sizeDropdown')">
+                                                    <span class="param-prefix">尺</span>
+                                                    <span id="sizeText">2K</span>
+                                                    <span class="param-arrow">▼</span>
+                                                </button>
+                                                <div class="param-menu" id="sizeMenu">
+                                                    <div class="param-option" onclick="selectImageSize('1K')">1K</div>
+                                                    <div class="param-option active" onclick="selectImageSize('2K')">2K</div>
+                                                    <div class="param-option" onclick="selectImageSize('3K')">3K</div>
+                                                    <div class="param-option" onclick="selectImageSize('4K')">4K</div>
                                                 </div>
                                             </div>
 
@@ -172,13 +184,14 @@
                                                     <span class="param-arrow">▼</span>
                                                 </button>
                                                 <div class="param-menu" id="ratioMenu">
-                                                    <div class="param-option" onclick="selectRatio('2048x2048', '1:1')">1:1</div>
-                                                    <div class="param-option" onclick="selectRatio('2048x2736', '3:4')">3:4</div>
-                                                    <div class="param-option" onclick="selectRatio('2736x2048', '4:3')">4:3</div>
-                                                    <div class="param-option active" onclick="selectRatio('2048x3640', '9:16')">9:16</div>
-                                                    <div class="param-option" onclick="selectRatio('3640x2048', '16:9')">16:9</div>
-                                                    <div class="param-option" onclick="selectRatio('2048x3072', '2:3')">2:3</div>
-                                                    <div class="param-option" onclick="selectRatio('3072x2048', '3:2')">3:2</div>
+                                                    <div class="param-option" onclick="selectRatio('1:1', '1:1')">1:1</div>
+                                                    <div class="param-option" onclick="selectRatio('3:4', '3:4')">3:4</div>
+                                                    <div class="param-option" onclick="selectRatio('4:3', '4:3')">4:3</div>
+                                                    <div class="param-option active" onclick="selectRatio('9:16', '9:16')">9:16</div>
+                                                    <div class="param-option" onclick="selectRatio('16:9', '16:9')">16:9</div>
+                                                    <div class="param-option" onclick="selectRatio('2:3', '2:3')">2:3</div>
+                                                    <div class="param-option" onclick="selectRatio('3:2', '3:2')">3:2</div>
+                                                    <div class="param-option" onclick="selectRatio('21:9', '21:9')">21:9</div>
                                                 </div>
                                             </div>
 
