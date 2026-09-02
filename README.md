@@ -25,11 +25,14 @@
 
 | 模型 | 用途 |
 | --- | --- |
-| `agnes-image-2.1-flash` | 图像生成（推荐） |
+| `agnes-image-2.5-flash` | 图像生成（推荐） |
+| `agnes-image-2.1-flash` | 图像生成（上一代） |
 | `agnes-image-2.0-flash` | 图像快速生成 |
-| `agnes-video-v2.0` | 视频生成 |
+| `agnes-video-2.5-flash` | 视频生成 |
 | `agnes-2.5-flash` | 通用对话 / 高并发（推荐） |
 | `agnes-2.0-flash` | 编程 / Agent / 推理 |
+
+图像模型默认使用 `agnes-image-2.5-flash`（[官方文档](https://agnes-ai.com/zh-Hans/docs/agnes-image-25-flash)）：相比 2.1 在图像生成、编辑、构图、细节与提示词遵循上整体更强，请求参数、支持尺寸与计费方式与 2.1 完全一致。下拉框保留 2.1 / 2.0 以便对比。
 
 ## 快速开始
 
@@ -83,6 +86,19 @@ http://localhost:5173
 | 视频生成 | `POST /videos` |
 | 视频查询 | `GET /agnesapi?video_id=...` |
 | 对话补全 | `POST /chat/completions` |
+
+### 图像生成参数
+
+| 参数 | 必填 | 说明 |
+| --- | --- | --- |
+| `model` | 是 | `agnes-image-2.5-flash` |
+| `prompt` | 是 | 生成或编辑指令 |
+| `size` | 是 | 官方推荐档位 `1K` / `2K` / `3K` / `4K`；也兼容 `1024x768` 这类精确尺寸，但非原生尺寸会被服务端归一化 |
+| `ratio` | 否 | 与档位式 `size` 配合，支持 `1:1`、`3:4`、`4:3`、`16:9`、`9:16`、`2:3`、`3:2`、`21:9`，默认 `1:1` |
+| `extra_body.image` | 图生图必填 | 参考图数组，公网 HTTPS URL 或完整 Data URI Base64 |
+| `extra_body.response_format` | 否 | `url` 或 `b64_json`；**不要放在请求体顶层** |
+
+> 当前页面传的是精确尺寸（如 9:16 → `2048x3640`），与 2.1 时期行为一致；如需可预期的输出尺寸，建议改用档位 `size` + `ratio`。
 
 说明：
 

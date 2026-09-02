@@ -76,3 +76,33 @@ test('video polling includes model_name param', () => {
   )
   assert.match(pollSection, /model_name=\$\{currentModel\}/)
 })
+
+test('image generation defaults to agnes-image-2.5-flash', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const html = readFileSync(resolve(root, 'index.html'), 'utf8')
+  assert.match(app, /let currentModel = 'agnes-image-2\.5-flash'/)
+  assert.match(html, /<span id="modelText">Image 2\.5<\/span>/)
+  assert.match(html, /param-option active" onclick="selectModel\('agnes-image-2\.5-flash'/)
+})
+
+test('image model menu lists 2.5 first and keeps legacy options', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const menuSection = app.slice(
+    app.indexOf('const modelMenu = document.getElementById'),
+    app.indexOf('// Update ratio menu')
+  )
+  assert.match(menuSection, /param-option active" onclick="selectModel\(\\'agnes-image-2\.5-flash\\'/)
+  assert.match(menuSection, /agnes-image-2\.1-flash/)
+  assert.match(menuSection, /agnes-image-2\.0-flash/)
+  assert.match(menuSection, /currentModel = 'agnes-image-2\.5-flash'/)
+})
+
+test('generated image payload uses currentModel', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const imageSection = app.slice(
+    app.indexOf('async function generateImage'),
+    app.indexOf('async function generateVideo')
+  )
+  assert.match(imageSection, /model: currentModel/)
+  assert.doesNotMatch(imageSection, /agnes-image-2\.[01]-flash/)
+})

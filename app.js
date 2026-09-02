@@ -1,5 +1,5 @@
         let currentGenMode = 'text2img';
-        let currentModel = 'agnes-image-2.1-flash';
+        let currentModel = 'agnes-image-2.5-flash';
         let uploadImages = []; // 支持多图
         let chatHistory = [];
         let apiKey = localStorage.getItem('agnes_api_key') || '';
@@ -212,10 +212,11 @@
                 currentModel = 'agnes-video-2.5-flash';
             } else {
                 modelMenu.innerHTML = `
-                    <div class="param-option active" onclick="selectModel(\'agnes-image-2.1-flash\', \'Image 2.1\')">Image 2.1 Flash</div>
+                    <div class="param-option active" onclick="selectModel(\'agnes-image-2.5-flash\', \'Image 2.5\')">Image 2.5 Flash</div>
+                    <div class="param-option" onclick="selectModel(\'agnes-image-2.1-flash\', \'Image 2.1\')">Image 2.1 Flash</div>
                     <div class="param-option" onclick="selectModel(\'agnes-image-2.0-flash\', \'Image 2.0\')">Image 2.0 Flash</div>`;
-                modelText.textContent = 'Image 2.1';
-                currentModel = 'agnes-image-2.1-flash';
+                modelText.textContent = 'Image 2.5';
+                currentModel = 'agnes-image-2.5-flash';
             }
 
             // Update ratio menu and display text
@@ -1098,7 +1099,8 @@
 ## 可用模型
 - agnes-2.5-flash: 通用对话/高并发（推荐）
 - agnes-2.0-flash: 编程/Agent/推理
-- agnes-image-2.1-flash: 图像生成（推荐）
+- agnes-image-2.5-flash: 图像生成（推荐）
+- agnes-image-2.1-flash: 图像生成（上一代）
 - agnes-image-2.0-flash: 图像快速生成
 - agnes-video-2.5-flash: 视频快速生成（推荐）
 
@@ -1112,6 +1114,12 @@
 2. 400 错误: 参数格式错误
 3. 429 错误: 请求过于频繁（RPM 限制 20）
 4. 500/503 错误: 服务器繁忙，稍后重试
+
+## 图片尺寸注意
+- size 推荐用档位 "1K" / "2K" / "3K" / "4K"，配合 ratio 使用
+- ratio 支持 1:1、3:4、4:3、16:9、9:16、2:3、3:2、21:9，默认 1:1
+- 1920x1080、2560x1440 等精确尺寸不是原生输出尺寸，会被归一化（如 16:9 的 1K 输出为 1312x736）
+- 想要 16:9 显示素材，建议 size = "2K" + ratio = "16:9"（输出 2624x1472），再在下游裁剪
 
 ## 图生图注意
 - image 参数放在 extra_body.image 中
