@@ -34,6 +34,18 @@ test('api endpoint uses china domain', () => {
   assert.doesNotMatch(app, /apihub\.agnes-ai\.com/)
 })
 
+test('chat defaults to agnes-3.0-flash and supports multiline input', () => {
+  const app = readFileSync(resolve(root, 'app.js'), 'utf8')
+  const html = readFileSync(resolve(root, 'index.html'), 'utf8')
+  assert.match(app, /let chatModel = 'agnes-3\.0-flash'/)
+  assert.match(html, /<span id="chatModelText">3\.0 Flash<\/span>/)
+  assert.match(html, /<textarea class="chat-input" id="chatInput" rows="1"/)
+  assert.match(html, /event\.shiftKey && !event\.isComposing/)
+  assert.match(app, /function autoResizeChatInput/)
+  assert.match(html, /Shift\+Enter 换行/)
+  assert.doesNotMatch(app, /agnes-2\.0-flash/)
+})
+
 test('video generation supports agnes-video-2.5-flash model', () => {
   const app = readFileSync(resolve(root, 'app.js'), 'utf8')
   assert.match(app, /agnes-video-2\.5-flash/)

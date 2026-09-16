@@ -235,12 +235,12 @@
                                 <div class="param-dropdown chat-model-dropdown" id="chatModelDropdown">
                                     <button class="toolbar-btn param-trigger" onclick="toggleDropdown('chatModelDropdown')">
                                         <span class="param-prefix">模</span>
-                                        <span id="chatModelText">2.5 Flash</span>
+                                        <span id="chatModelText">3.0 Flash</span>
                                         <span class="param-arrow">▼</span>
                                     </button>
                                     <div class="param-menu" id="chatModelMenu">
-                                        <div class="param-option active" onclick="selectChatModel('agnes-2.5-flash', '2.5 Flash')">Agnes 2.5 Flash</div>
-                                        <div class="param-option" onclick="selectChatModel('agnes-2.0-flash', '2.0 Flash')">Agnes 2.0 Flash</div>
+                                        <div class="param-option active" onclick="selectChatModel('agnes-3.0-flash', '3.0 Flash')">Agnes 3.0 Flash</div>
+                                        <div class="param-option" onclick="selectChatModel('agnes-2.5-flash', '2.5 Flash')">Agnes 2.5 Flash</div>
                                     </div>
                                 </div>
                             </div>
@@ -260,7 +260,7 @@
                                     上传
                                     <input type="file" accept="image/*" multiple hidden onchange="handleChatUpload(this)">
                                 </label>
-                                <input class="chat-input" id="chatInput" placeholder="输入消息，或粘贴图片继续分析" onkeydown="if(event.key==='Enter' && !event.isComposing) sendChat()" onpaste="handleChatPaste(event)">
+                                <textarea class="chat-input" id="chatInput" rows="1" placeholder="输入消息，Shift+Enter 换行，或粘贴图片继续分析" onkeydown="if(event.key==='Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); sendChat(); }" oninput="autoResizeChatInput(this)" onpaste="handleChatPaste(event)"></textarea>
                                 <button class="chat-send" onclick="sendChat()">发送</button>
                             </div>
                         </div>
@@ -303,7 +303,7 @@
                     </article>
                     <article class="model-card reveal">
                         <div class="model-card-top">
-                            <strong>Agnes 2.5 Flash</strong>
+                            <strong>Agnes 3.0 Flash</strong>
                             <span class="model-tag">对话</span>
                         </div>
                         <p>免费文本问答、图片分析与深度思考，适合继续拆解结果。</p>

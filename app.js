@@ -1031,7 +1031,7 @@
         }
 
         // 文本对话模型
-        let chatModel = 'agnes-2.5-flash';
+        let chatModel = 'agnes-3.0-flash';
 
         function selectChatModel(value, text, sourceEvent = window.event) {
             chatModel = value;
@@ -1039,6 +1039,11 @@
             document.querySelectorAll('#chatModelMenu .param-option').forEach(o => o.classList.remove('active'));
             sourceEvent?.target?.classList.add('active');
             toggleDropdown('chatModelDropdown');
+        }
+
+        function autoResizeChatInput(input) {
+            input.style.height = 'auto';
+            input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
         }
 
         // 清空对话
@@ -1119,8 +1124,8 @@
 你是 Agnes AI 的技术支持助手，专门帮助用户解决 API 配置和使用问题。你具备联网搜索能力，可以查询最新的信息。
 
 ## 可用模型
-- agnes-2.5-flash: 通用对话/高并发（推荐）
-- agnes-2.0-flash: 编程/Agent/推理
+- agnes-3.0-flash: 通用对话/高并发（推荐）
+- agnes-2.5-flash: 通用对话/高并发
 - agnes-image-2.5-flash: 图像生成
 - agnes-video-2.5-flash: 视频快速生成（推荐）
 
@@ -1386,6 +1391,7 @@
             const userMsg = text || `请分析这 ${chatImages.length} 张图片`;
             addChatMsg('user', userMsg, chatImages);
             input.value = '';
+            autoResizeChatInput(input);
 
             const content = [];
             chatImages.forEach(img => content.push({ type: 'image_url', image_url: { url: img } }));

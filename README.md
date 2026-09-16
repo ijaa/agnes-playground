@@ -27,8 +27,8 @@
 | --- | --- |
 | `agnes-image-2.5-flash` | 图像生成 |
 | `agnes-video-2.5-flash` | 视频生成 |
-| `agnes-2.5-flash` | 通用对话 / 高并发（推荐） |
-| `agnes-2.0-flash` | 编程 / Agent / 推理 |
+| `agnes-3.0-flash` | 通用对话 / 高并发（推荐） |
+| `agnes-2.5-flash` | 通用对话 / 高并发 |
 
 图像生成统一使用 `agnes-image-2.5-flash`（[官方文档](https://agnes-ai.com/zh-Hans/docs/agnes-image-25-flash)）：相比 2.1 在图像生成、编辑、构图、细节与提示词遵循上整体更强，请求参数、支持尺寸与计费方式与 2.1 一致。旧版 2.1 / 2.0 生图模型已从下拉框移除。
 

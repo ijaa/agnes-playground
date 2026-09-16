@@ -1346,8 +1346,13 @@ button {
 .chat-input {
     flex: 1;
     min-height: 40px;
-    padding: 0 14px;
+    max-height: 160px;
+    padding: 10px 14px;
     font-size: 14px;
+    resize: none;
+    overflow-y: auto;
+    line-height: 20px;
+    transition: height 0.15s ease;
 }
 
 .thinking-dots {
